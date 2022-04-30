@@ -1,0 +1,16 @@
+RRTGlobalPlanner:
+  goal_tol: 0.1
+  K_in: 400
+  d: 0.2
+  viz_tree: true
+  
+  # Goal pick Bias in percent.
+  bias: 7
+  
+  # Locations of office delivery Points.
+  goal1: [-6,.75]
+  goal2: [-5,4]
+  goal3: [6.25,-3]
+  goal4: [6.25,4]
+  goal5: [3,4.5]
+  goal6: [-5.5,-4]
