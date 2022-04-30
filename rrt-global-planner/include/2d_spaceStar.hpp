@@ -152,7 +152,7 @@ bool isBias(const int bias)
 
   int random_integer = uni(rng);
 
-  ROS_INFO("The random bias is %i.",random_integer); 
+  //ROS_INFO("The random bias is %i.",random_integer); 
 
   if (random_integer <= bias)
   {
@@ -178,12 +178,13 @@ bool isBias(const int bias)
  *  @return             Random point on global costmap where robot is in free space.
  *
  */
-geometry_msgs::Point getRandomState(costmap_2d::Costmap2DROS* costmap_ros, const double robot_radius, const int bias, const geometry_msgs::Point* goalState)
+geometry_msgs::Point getRandomState(costmap_2d::Costmap2DROS* costmap_ros, const double robot_radius, const int bias, const geometry_msgs::Point goalState)
 {
   geometry_msgs::Point randomState{};
   randomState.z = 0.;  // Assume z=0 for now.
   costmap_2d::Costmap2D* costmap_;
   costmap_ = costmap_ros->getCostmap();
+  //ROS_INFO("got the map!");
 
   // Keep picking points until you find one in free space
   bool pointIsFree{ 0 };
@@ -191,21 +192,24 @@ geometry_msgs::Point getRandomState(costmap_2d::Costmap2DROS* costmap_ros, const
   double origin_x = costmap_->getOriginX();
   double origin_y = costmap_->getOriginY();
 
+
   while (!pointIsFree)
   {
+    //ROS_INFO("Check the the bias!");
     // Bias Check. Should we pick the goal position?
     if (isBias(bias))
     {
-      randomState.x = goalState->x;
-      randomState.y = goalState->y;
+      randomState.x = goalState.x;
+      randomState.y = goalState.y;
     }
     else
     {
       randomState.x = randomDouble(origin_x, origin_x + costmap_->getSizeInMetersX());
       randomState.y = randomDouble(origin_y, origin_y + costmap_->getSizeInMetersY());
     }
-    ROS_INFO("Check the point!"); 
+    //ROS_INFO("Check the point!"); 
     pointIsFree = inFreeSpace(randomState, costmap_ros, robot_radius);
   }
+  //ROS_INFO("The random state is x: %f and y: %f.", randomState.x, randomState.y);
   return randomState;
 }

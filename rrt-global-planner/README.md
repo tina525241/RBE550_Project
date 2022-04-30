@@ -24,8 +24,6 @@ After launching the system, when you set a `move_base/goal` using RViz's `2D Nav
 
 `RRTGlobalPlanner`'s output can be visualized in RViz. To see the global path, add a `Path` display and subscribe to `~/move_base/RRTGlobalPlanner/plan`. To see the full tree (`viz_tree` must be true), add a `Marker` display and subscribe to `~/move_base/RRTGlobalPlanner/tree`.
 
-Open the amcl.launch file and change the default coordinates to -2.0 for "x" and -0.5 for "y". 
-
 ## Examples
 An example launch file for using `RRTGlobalPlanner` with the [TurtleBot3 Simulation](https://emanual.robotis.com/docs/en/platform/turtlebot3/simulation/) is located in [rrt-global-planner/launch](https://github.com/mech0ctopus/rrt-global-planner/tree/main/launch).
 
