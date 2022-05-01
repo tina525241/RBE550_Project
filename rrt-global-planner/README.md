@@ -16,7 +16,7 @@ git clone https://github.com/ROBOTIS-GIT/turtlebot3_msgs.git
 git clone https://github.com/ROBOTIS-GIT/turtlebot3.git
 cd ~/catkin_ws && catkin_make
 ```
-Then it is necessary to establis hthe default model used, the 'burger' model.
+Then it is necessary to establish the default model used, the 'burger' model.
 ```bash
 gedit ~/.bashrc
 ```
@@ -47,7 +47,7 @@ Within the [move\_base](https://wiki.ros.org/move_base) node in your launch file
 <param name="base_global_planner" value="global_planner/RRTGlobalPlanner"/>
 <rosparam file="$(find rrt-global-planner)/params/rrt_global_planner.yaml" command="load" />
 ```
-In `the amcl.launch` file (`turtlebot3/turtlebot3_navigation/launch`), change the `initial_pose_x` to -2.0 and the `initial_pose_y` to -0.5.
+In the `amcl.launch` file (`turtlebot3/turtlebot3_navigation/launch`), change the `initial_pose_x` to -2.0 and the `initial_pose_y` to -0.5.
 ```
   <arg name="initial_pose_x" default="-2.0"/>
   <arg name="initial_pose_y" default="-0.50"/>
