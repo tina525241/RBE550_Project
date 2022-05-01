@@ -89,3 +89,7 @@ None.
 
 ### Services
 None.
+
+### Sources
+Orignal package created by Craig Daniel Miller.
+Miller C. (2021).rrt-global-planner, GitHub Repository, https://github.com/mech0ctopus/rrt-global-planner​
