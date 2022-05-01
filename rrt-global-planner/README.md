@@ -9,7 +9,7 @@ This package was created to run in:
 ROS Noetic 
 
 Turtlebot 3 is needed to run this plugin. 
-These instuctions come from "How to Launch the Turtlebot3 Simulation With ROS", by Automatic Addisopn (https://automaticaddison.com/how-to-launch-the-turtlebot3-simulation-with-ros/).
+These instuctions come from "How to Launch the Turtlebot3 Simulation With ROS", by Automatic Addison (https://automaticaddison.com/how-to-launch-the-turtlebot3-simulation-with-ros/).
 ```bash
 cd ~/catkin_ws/src
 git clone https://github.com/ROBOTIS-GIT/turtlebot3_msgs.git
