@@ -7,7 +7,7 @@ RRTGlobalPlanner:
   # Goal pick Bias in percent.
   bias: 7
   
-  # Locations of office delivery Points.
+  # Locations of office delivery Points. (Unused. Planned use in Multigoal Testing.)
   goal1: [-6,.75]
   goal2: [-5,4]
   goal3: [6.25,-3]

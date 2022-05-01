@@ -7,10 +7,7 @@
   <arg name="odom_topic" default="odom" />
 
   <!-- Gazebo -->
-  <include file="$(find turtlebot3_gazebo)/launch/turtlebot3_world.launch">
-  <!--  <arg name="gui" value="false"/> -->
-  <!--  <arg name="world_name" value="$(find turtlebot3_gazebo)/worlds/turtlebot3_world.world"/> -->
-  </include>
+  <include file="$(find turtlebot3_gazebo)/launch/turtlebot3_world.launch"></include>
 
   <!-- Turtlebot3 -->
   <include file="$(find turtlebot3_bringup)/launch/turtlebot3_remote.launch">
@@ -33,7 +30,7 @@
     <rosparam file="$(find turtlebot3_navigation)/param/global_costmap_params.yaml" command="load" />
     <rosparam file="$(find turtlebot3_navigation)/param/move_base_params.yaml" command="load" />
     <rosparam file="$(find turtlebot3_navigation)/param/dwa_local_planner_params_$(arg model).yaml" command="load" />
-    <rosparam file="$(find rrt-global-planner)/params/rrt_global_planner.yaml" command="load" />
+    <rosparam file="$(find rrt-global-planner)/params/rrtStar_global_planner.yaml" command="load" />
     <remap from="cmd_vel" to="$(arg cmd_vel_topic)"/>
     <remap from="odom" to="$(arg odom_topic)"/>
     <param name="DWAPlannerROS/min_vel_x" value="0.0" if="$(arg move_forward_only)" />

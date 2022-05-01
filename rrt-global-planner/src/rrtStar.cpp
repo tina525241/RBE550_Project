@@ -1,4 +1,8 @@
 #include <pluginlib/class_list_macros.h>
+#include <move_base_msgs/MoveBaseAction.h>
+#include <actionlib/client/simple_action_client.h>
+#include <nav_msgs/Odometry.h>
+
 #include "rrtStar.hpp"
 
 // register this planner as a BaseGlobalPlanner plugin
@@ -77,6 +81,7 @@ bool RRTGlobalPlanner::makePlan(const geometry_msgs::PoseStamped& start, const g
   {
     // Get Global path (clears, then sets plan)
     getGlobalPath(&T_out, &plan, start, goal);
+
     publishPlan(plan);
     return true;
   }
@@ -114,3 +119,6 @@ void RRTGlobalPlanner::publishPlan(const std::vector<geometry_msgs::PoseStamped>
   plan_pub_.publish(rviz_path);
 }
 };  // namespace global_planner
+
+// Define a client for to send goal requests to the move_base server through a SimpleActionClient
+typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;

@@ -61,7 +61,10 @@ struct tree_node
   int parent_id{};
   geometry_msgs::Point vertex{};
 
-  // Team, Robot Deliveres: Added
+  // Added to track distance to node which is necessary
+  // for Nearest Node. Also need a flag to designate the
+  // goal Node.
+
   double dist{0};
   bool goalAchieved{false};
 };
@@ -123,43 +126,31 @@ public:
  *   to an arbitary point.
  *
  *  @param point1 An arbitary point.
- *  @param rrt Existing RRT object.
+ *  @param T Existing RRT object.
+ *  @param d Distance to extend tree.
  *  @return The closest (L2) tree node to point1.
  *
  **/
 tree_node getNearestNeighbor(const geometry_msgs::Point point1, const rrt* T, const double d)
 {
-  //geometry_msgs::Point nearest_neighbor{};
+  std::vector<tree_node> nearby{};
   tree_node nearest_neighbor_node{};
-  //int parent_id{};
+  std::vector<int> parent_ids{};
   double nearest_distance{ HUGE_VAL };
   double current_distance{ HUGE_VAL };
-
-  /* Team, Robot Deliveres: Added*/
   double searchRadius = (d+1);
-  std::vector<tree_node> nearby{};
-  std::vector<int> parent_ids{};
-  int loc{};
+  int chosen_node{};
 
-  //int sizeCheck{};
-  //double distcheck{};
-
-  //ROS_INFO("Start the search");
   // If we don't have enough nodes to make a choice, keep running.
   while (parent_ids.size() <= 0)
   {
     // Check all the nodes currently in the tree.
-    //sizeCheck = T->tree_nodes.size();
-    //ROS_INFO("Tree Size is: %i.",sizeCheck);
     for (int i = 0; i < T->tree_nodes.size(); i++)
     {
       // Make sure it's not the same point
       if (point1.x != T->tree_nodes.at(i).vertex.x && point1.y != T->tree_nodes.at(i).vertex.y)
       {
         // If the node is within the Search Radius, add it to our evaluation list.
-
-        //distcheck = getDistance(point1, T->tree_nodes.at(i).vertex);
-        //ROS_INFO("The Distance between points is %f and the search radisu is %f.", distcheck, searchRadius);
         if (getDistance(point1, T->tree_nodes.at(i).vertex) < searchRadius)
         {
           nearby.push_back(T->tree_nodes.at(i));
@@ -167,77 +158,33 @@ tree_node getNearestNeighbor(const geometry_msgs::Point point1, const rrt* T, co
         }
       }
     }
+    // If no node is found in the search, increase the radius of the search.
     if (parent_ids.size() < 1)
     {
       searchRadius *= 1.5;
     }
   }
-  /*
-  // Make sure we have at least two nodes to choose from.
-  // if we do not have a minimum two nodes, clear out "nearby"
-  // and "parent IDs".
-  // Then increase the search radius by half of the connection 
-  // distance, "d", and start the search again.
-  if (nearby.size() < 2)
-  {
-    nearby.clear();
-    parent_ids.clear();
-
-    incre += .5;
-
-    continue;
-  }
-  */
 
   // Pick the node with the shortest path to the Start
-  //sizeCheck = nearby.size();
-  //ROS_INFO("Nearby Size is: %i.",sizeCheck);
   for (int j = 0; j < nearby.size(); j++)
   {
     // Current Distance = the Distance from the Neighbor Node to the random node 
     // + the distance from Start Node to the Neighbor Node
     current_distance = getDistance(point1, nearby[j].vertex) + nearby[j].dist;
 
-
-
     if (current_distance  < nearest_distance)
     {
       nearest_distance = nearby[j].dist;
-      loc = j;
+      chosen_node = j;
     }
   }
-
 
   // Dump our chosen values into our output variable.
-  nearest_neighbor_node.vertex = nearby.at(loc).vertex;
+  nearest_neighbor_node.vertex = nearby.at(lchosen_node).vertex;
   nearest_neighbor_node.vertex.z = 0.0;  // Assume planar for now
-  nearest_neighbor_node.parent_id = parent_ids[loc];
+  nearest_neighbor_node.parent_id = parent_ids[chosen_node];
   nearest_neighbor_node.dist = nearest_distance;
   return nearest_neighbor_node;
-/*
-  // For each vertex (a tree_node)
-  for (int ii = 0; ii < T->tree_nodes.size(); ii++)
-  {
-    // Make sure it's not the same point
-    if (point1.x != T->tree_nodes.at(ii).vertex.x && point1.y != T->tree_nodes.at(ii).vertex.y)
-    {
-      // Get the closest existing vertex
-      current_distance = getDistance(point1, T->tree_nodes.at(ii).vertex);
-      if (current_distance < nearest_distance)
-      {
-        nearest_distance = current_distance;
-        nearest_neighbor = T->tree_nodes.at(ii).vertex;
-        parent_id = ii;
-      }
-    }
-  }
-
-  nearest_neighbor_node.vertex = nearest_neighbor;
-  nearest_neighbor_node.vertex.z = 0.;  // Assume planar for now
-  nearest_neighbor_node.parent_id = parent_id;
-
-  return nearest_neighbor_node;
-  */
 }
 
 /**
@@ -282,6 +229,7 @@ tree_node extendTree(const tree_node point_near, const geometry_msgs::Point poin
  *  @param goal_tol Cartesian goal tolerance.
  *  @param K Max. number of iterations.
  *  @param d Distance to extend tree per step.
+ *  @param bias The percentage chance of picking the goal state.
  *  @return Full RRT linking x_init and x_final.
  *
  **/
@@ -300,21 +248,13 @@ rrt generateRRT(geometry_msgs::PoseStamped x_init, geometry_msgs::PoseStamped x_
     bool edgeIsFree{ 0 };
     std::vector<geometry_msgs::Point> edge{};
 
-    /*
     // Get random configuration
-    x_rand = getRandomState(T.X_space, robot_radius);
-    */
-
-    // Get random configuration
-    //ROS_INFO("Getting Random Node!"); 
     x_rand = getRandomState(T.X_space, robot_radius, bias, x_final.pose.position);
 
     
     // Get nearest existing neighbor to random pose
-    //ROS_INFO("Getting nearest!"); 
     x_near = getNearestNeighbor(x_rand, &T, d);
     //ROS_INFO("extending tree!"); 
-    // Extend x_near toward x_rand
     x_new = extendTree(x_near, x_rand, d);
 
     // Check if x_new and x_near can connect
@@ -339,17 +279,6 @@ rrt generateRRT(geometry_msgs::PoseStamped x_init, geometry_msgs::PoseStamped x_
     {
       continue;
     };
-
-    // ROS_INFO("Processed %i/%i RRT vertices.", k, K);
-    /*
-    if (getDistance(x_new.vertex, x_final.pose.position) <= goal_tol)
-    {
-      ROS_INFO("Found solution with %i/%i RRT vertices.", k, K);
-      
-      T.success = 1;
-      break;
-    }
-    */
   }
   return T;
 }
@@ -383,6 +312,16 @@ double getRobotRadius(std::vector<geometry_msgs::Point> footprint)
   return max_dist;
 }
 
+/**
+ *  @brief Find the shortest Goal node in the rrt "Tree"
+ *
+ *  @details
+ *   Checks all of the Goal Flagged nodes for the shortest path.
+ *
+ *  @param tree Pointer to a tree linking the start and goal poses.
+ *  @return An integer of the index of the shortes path node.
+ *
+ **/
 int getShortestPathId(const rrt* tree)
 {
   double currentDist{HUGE_VAL};
@@ -424,12 +363,7 @@ bool getGlobalPath(const rrt* tree, std::vector<geometry_msgs::PoseStamped>* pla
 
   plan->clear();
 
-  /*
-  // Add last vertex (closest to goal)
-  int current_id = tree->tree_nodes.size() - 1;
-  */
-
-  // Add shortes path vertex
+  // Add shortest path vertex
   int current_id = getShortestPathId(tree);
 
   // Set goal orientation for last vertex

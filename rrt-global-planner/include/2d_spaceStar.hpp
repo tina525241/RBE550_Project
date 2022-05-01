@@ -140,7 +140,7 @@ bool edgeInFreeSpace(const std::vector<geometry_msgs::Point> edge, const costmap
  *  @see   https://stackoverflow.com/questions/5008804/generating-random-integer-from-a-range
  *
  *  @param bias The percentage chance of picking the goal state.
- *  @return             If the chosen point should be bias (the Goal State).
+ *  @return     True or False, if the chosen point should be bias (the Goal State).
  *
  */
 bool isBias(const int bias)
@@ -151,8 +151,6 @@ bool isBias(const int bias)
   std::uniform_int_distribution<int> uni(1,100); // guaranteed unbiased
 
   int random_integer = uni(rng);
-
-  //ROS_INFO("The random bias is %i.",random_integer); 
 
   if (random_integer <= bias)
   {
@@ -195,21 +193,19 @@ geometry_msgs::Point getRandomState(costmap_2d::Costmap2DROS* costmap_ros, const
 
   while (!pointIsFree)
   {
-    //ROS_INFO("Check the the bias!");
     // Bias Check. Should we pick the goal position?
     if (isBias(bias))
     {
       randomState.x = goalState.x;
       randomState.y = goalState.y;
     }
+    // Pick a Random State Instead
     else
     {
       randomState.x = randomDouble(origin_x, origin_x + costmap_->getSizeInMetersX());
       randomState.y = randomDouble(origin_y, origin_y + costmap_->getSizeInMetersY());
     }
-    //ROS_INFO("Check the point!"); 
     pointIsFree = inFreeSpace(randomState, costmap_ros, robot_radius);
   }
-  //ROS_INFO("The random state is x: %f and y: %f.", randomState.x, randomState.y);
   return randomState;
 }
